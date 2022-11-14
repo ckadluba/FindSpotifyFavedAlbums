@@ -1,9 +1,26 @@
-# Token generated with Spotify Dev console: https://spotify.dev/console/get-current-user-saved-albums/
-# Scope: user-library-read
-$token = "BQBHFwtbKvN6p55bAh1UesuDYhBeKTTIu5CIT7hGBpWXkGGfuoPbkedvaskLpbnu44Tj-m5DAZZo-wcBcIgHXeNjBRvUASSbVQK42Fj8UoWL2ojzMuFpVtUl5PyjhlKNb5RDy3BO5uhooYgwGGr0Y6G56gIyB9_t6dPA9yjU_9wGNx7XtyvHSYBk"
-$authHeader = "Bearer " + $token
+[CmdletBinding()]
+param (
+    [Parameter(Mandatory=$true)]
+    [string]
+    $Year,
 
-$year = "2022"
+    [Parameter(Mandatory=$true)]
+    [string]
+    $AccessToken,
+
+    [Parameter()]
+    [switch]
+    $OnlyAlbums,
+
+    [Parameter()]
+    [switch]
+    $PrintMetadata
+)
+
+# Token can be generated with Spotify Dev console: https://spotify.dev/console/get-current-user-saved-albums/
+# Scope: user-library-read
+
+$authHeader = "Bearer " + $AccessToken
 $limit = 20
 $offset = 0
 
@@ -16,12 +33,24 @@ while ($true)
         break
     }
 
-    $albumsOfYear = $response.items | Where-Object { $_.album.release_date.Contains($year) }
+    if ($OnlyAlbums.IsPresent -eq $true)
+    {
+        $albumsOfYear = $response.items | Where-Object { $_.album.release_date.Contains($Year) -and ($_.album.album_type -eq "album" -or $_.album.album_type -eq "compilation") }
+    }
+    else
+    {
+        $albumsOfYear = $response.items | Where-Object { $_.album.release_date.Contains($Year) }
+    }
+
     foreach ($item in $albumsOfYear)
     {
         $album = $item.album
         $artist = $album.artists[0]
-        $line = "$($artist.name) - $($album.name) (released: $($album.release_date), tracks: $($album.tracks.total))"
+        $line = "$($artist.name) - $($album.name) ($($album.label))"
+        if ($PrintMetadata.IsPresent -eq $true)
+        {
+            $line = "$line [released: $($album.release_date), type: $($album.album_type), tracks: $($album.tracks.total)]"
+        }
         Write-Output $line
     }
 
