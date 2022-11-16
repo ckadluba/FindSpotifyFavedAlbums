@@ -24,6 +24,7 @@ $offset = 0
 while ($true)
 {
     # Query batch
+    Write-Verbose "Sending request, offset=$offset ..."
     $uri = "https://api.spotify.com/v1/me/albums?limit=" + $limit + "&offset=" + $offset
     $response = Invoke-RestMethod -Uri $uri -Method GET -Headers @{Accept = "application/json"; Authorization = $authHeader}
     if (($null -eq $response) -or ($response.items.Count -eq 0))

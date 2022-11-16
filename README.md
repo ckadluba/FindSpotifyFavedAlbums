@@ -38,6 +38,8 @@ Get title, artist and label of faved albums of type `album` or `compilation` rel
 * OnlyReleaseTypes  
   List of release types to be returned (optional).  
   Allowed valued include "album", "single" and "compilation". Refer to Spotify API reference for allowed values (https://developer.spotify.com/documentation/web-api/reference/#/).
+* Verbose  
+  Display info about sent API requests.
 
 # Prerequisites
 
