@@ -33,33 +33,33 @@ while ($true)
     }
 
     # Filter result
-    $albumsOfYear = $response.items
+    $filteredAlbums = $response.items
     if ($ReleaseDateBegin)
     {
-        $albumsOfYear = $albumsOfYear | Where-Object { $_.album.release_date -ge $ReleaseDateBegin }
+        $filteredAlbums = $filteredAlbums | Where-Object { $_.album.release_date -ge $ReleaseDateBegin }
     }
     if ($ReleaseDateEnd)
     {
-        $albumsOfYear = $albumsOfYear | Where-Object { $_.album.release_date -le $ReleaseDateEnd }
+        $filteredAlbums = $filteredAlbums | Where-Object { $_.album.release_date -le $ReleaseDateEnd }
     }
     if ($null -ne $OnlyReleaseTypes)
     {
-        $albumsOfYear = $albumsOfYear | Where-Object { $OnlyReleaseTypes.Contains($_.album.album_type) }
+        $filteredAlbums = $filteredAlbums | Where-Object { $OnlyReleaseTypes.Contains($_.album.album_type) }
     }
 
     # Output filtered batch as flattened objects
-    foreach ($item in $albumsOfYear)
+    foreach ($filteredAlbum in $filteredAlbums)
     {
-        $album = New-Object PSObject
+        $flatAlbum = New-Object PSObject
 
-        Add-Member -InputObject $album -MemberType NoteProperty -Name ArtistName -Value $item.album.artists[0].name
-        Add-Member -InputObject $album -MemberType NoteProperty -Name AlbumName -Value $item.album.name
-        Add-Member -InputObject $album -MemberType NoteProperty -Name Label -Value $item.album.label
-        Add-Member -InputObject $album -MemberType NoteProperty -Name ReleaseDate -Value $item.album.release_date
-        Add-Member -InputObject $album -MemberType NoteProperty -Name AlbumType -Value $item.album.album_type
-        Add-Member -InputObject $album -MemberType NoteProperty -Name NumberTracks -Value $item.album.tracks.total
+        Add-Member -InputObject $flatAlbum -MemberType NoteProperty -Name ArtistName -Value $filteredAlbum.album.artists[0].name
+        Add-Member -InputObject $flatAlbum -MemberType NoteProperty -Name AlbumName -Value $filteredAlbum.album.name
+        Add-Member -InputObject $flatAlbum -MemberType NoteProperty -Name Label -Value $filteredAlbum.album.label
+        Add-Member -InputObject $flatAlbum -MemberType NoteProperty -Name ReleaseDate -Value $filteredAlbum.album.release_date
+        Add-Member -InputObject $flatAlbum -MemberType NoteProperty -Name AlbumType -Value $filteredAlbum.album.album_type
+        Add-Member -InputObject $flatAlbum -MemberType NoteProperty -Name NumberTracks -Value $filteredAlbum.album.tracks.total
 
-        Write-Output $album
+        Write-Output $flatAlbum
     }
 
     $offset += $limit
